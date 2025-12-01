@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd ~/fall2024-comp206/assignments/hw3
+
+
+sed '1d' worldcities.csv | cut -d ',' -f 4 | sort | uniq | while read -r Country; do # puts the countries in alphabatical order and each country is written only once. The while loop takes each country as an input and outputs the country name with its cities'average population	
+	Average=$(./analyze average "$Country")
+	echo "$Country" "$Average"
+done
+exit 0
+

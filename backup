@@ -1,0 +1,14 @@
+#!/bin/bash
+Date=$(date -Ins | cut  -c 1-19)
+dirName="assignments-$Date"
+if ! ls ~/fall2024-comp206/backups >/dev/null 2>&1
+then 		mkdir ~/fall2024-comp206/backups
+fi	
+tar -cvf  ~/fall2024-comp206/backups/"$dirName".tar.gz ~/fall2024-comp206/assignments >/dev/null 2>&1
+if test $? -eq 0
+then	
+	echo "Created backup: backups/"$dirName".tar.gz":
+	exit 0
+else 
+	exit 1
+fi

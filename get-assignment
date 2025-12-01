@@ -1,0 +1,35 @@
+#!/bin/bash
+if test $# -eq 0 || test $# -ge 2
+then
+	echo "Ivalid arguments. For more information on how to use 'get assignment', use 'get-assignment -h."
+	exit 1
+elif test "$1" = "-h"
+then
+	echo "You need to use one argument with the name of the hw you want to get. Example: 'get-assignment hw3'."
+	exit 1
+fi
+
+if ls ~/fall2024-comp206/assignments/"$1" >/dev/null 2>&1
+then
+	echo "The target directory already exists. If you want to replace that directory with a fresh clone, enter 'yes'. If you don't want to replace it, enter 'no'."
+	read ans
+	if test "$ans" = "no"
+	then
+		exit 0
+	elif test "ans" = "yes"
+	then
+		rm -rf ~/fall2024-comp206/assignments/"$1"
+	fi	
+fi
+tempPath=$(mktemp)
+cd ~/fall2024-comp206/assignments
+git clone https://gitlab.cs.mcgill.ca/jerrin/f24comp206-"$1".git "$1" >"$tempPath" 2>&1
+if test $? -eq 0 >/dev/null 2>&1
+then
+	rm "$tempPath"
+	exit 0
+else
+	cat "$tempPath"
+	rm "$tempPath"
+	exit 1
+fi

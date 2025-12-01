@@ -1,0 +1,68 @@
+#!/bin/bash
+
+tempPath=$(mktemp)
+
+opName="$1"
+Country="$2"
+cd ~/fall2024-comp206/assignments/hw3
+rows-for () {
+	grep -w "$Country" worldcities.csv >/dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		cat worldcities.csv | cut -d "," -f 4,8 | grep -w "$Country" | cut -d "," -f 2 >"$tempPath"  # stores population of each city from the required country	
+	else
+		echo 0
+		exit 1
+	fi
+}
+rows-for  # calls rows-for to fill the temp file with the data required to do the 'sum', 'total', and 'count' functions
+sum () {
+        TotalPop=0
+        while read -r num; do  # loops through the temp file, line by line, to sum the value of all the city populations
+		if [ num = "" ]; then
+			num=0
+		fi
+                TotalPop=$((TotalPop+num))
+        done <"$tempPath"
+        echo "$TotalPop"
+}
+
+total () {
+	sum
+}
+
+count () {
+	cat worldcities.csv | cut -d "," -f 4,8 | grep -w "$Country" | cut -d "," -f 1 | grep -c .  # counts the number of lines in the temp file which is the same as the number of cities
+}
+
+average () {
+	Population=$(total)
+	Cities=$(count)
+	if [ "$Cities" -eq 0 ]; then
+		Avg=0
+	else
+		Avg=$((Population/Cities))
+	fi
+	echo "$Avg"
+}
+
+if [ $# -le 1 ]; then
+        echo "You have entered an incorrect number of arguments. Run the script in the form './analyze [operation] [Country]' where the operations are 'total', 'count', or 'average'."
+        exit 1
+elif [ "$opName" != "total" ] && [ "$opName" != "average" ] && [ "$opName" != "count" ]; then
+        echo "You have entered an incorrect operation. The available operations are 'total', 'count', or 'average'."
+        exit 1
+fi
+
+if [ "$opName" = "total" ]; then
+        countryPop=$(total)
+        echo "$countryPop"
+elif [ "$opName" = "count" ]; then
+        cityNum=$(count)
+        echo "$cityNum"
+else
+        cityAvg=$(average)
+        echo "$cityAvg"
+fi
+
+rm "$tempPath"
+exit 0
